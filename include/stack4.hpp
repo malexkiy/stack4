@@ -8,14 +8,16 @@ template <typename T>
 class stack
 {
 public:
-	stack() noexcept;
-	size_t count() const noexcept;
+	stack() /* noexcept */;
+	stack(stack<T> const&) /* strong */;
+	stack<T>& operator=(stack<T> const&) /* strong */;
+	size_t count() const /* noexcept */;
 	void push(T const &) /* strong */;
 	void pop() /* strong */;
 	T top() const /* strong */;
 
 private:
-	void swap(stack<T>&) noexcept;
+	void swap(stack<T>&) /* noexcept */;
 	T * array_;
 	size_t array_size_;
 	size_t count_;
@@ -24,13 +26,13 @@ private:
 
 template <typename T>
 stack<T>::stack()
-	: count_(0), array_size_(0), array_(nullptr) noexcept
+	: count_(0), array_size_(0), array_(nullptr) /* noexcept */
 {
 }
 
 
 template <typename T>
-void stack<T>::swap(stack<T>& obj) noexcept
+void stack<T>::swap(stack<T>& obj) /* noexcept */
 {
 	using std::swap;
 
@@ -39,16 +41,41 @@ void stack<T>::swap(stack<T>& obj) noexcept
 	swap(array_, obj.array_);
 }
 
+template <typename T>
+stack<T>::stack(stack<T> const& other) /* strong */
+{
+	auto narray = new T[other.array_size_];
+
+	count_ = other.count_;
+	array_size_ = other.array_size_;
+	array_ = narray;
+
+	std::copy(other.array_, other.array_ + count_, array_);
+}
+
 
 template <typename T>
-size_t stack<T>::count() const noexcept
+stack<T>& stack<T>::operator=(stack<T> const& other) /* strong */
+{
+	if (this != &other)
+	{
+		stack<T> tmp(other);
+		swap(tmp);
+	}
+
+	return *this;
+}
+
+
+template <typename T>
+size_t stack<T>::count() const /* noexcept */
 {
 	return count_;
 }
 
 
 template <typename T>
-void stack<T>::push(T const& obj) /* strong */
+void stack<T>::push(T const& obj)
 {
 	if (count_ == array_size_)
 	{
