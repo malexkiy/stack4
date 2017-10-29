@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <utility>
+#include <new>
 
 template <typename T>
 class stack
@@ -44,13 +45,24 @@ void stack<T>::swap(stack<T>& obj) /* noexcept */
 template <typename T>
 stack<T>::stack(stack<T> const& other) /* strong */
 {
-	auto narray = new T[other.array_size_];
+	T* narray = nullptr;
+	try
+	{
+		narray = new T[other.array_size_];
+	}
+	catch(std::bad_alloc e)
+	{
+		throw e.what();
+	}
 
-	count_ = other.count_;
-	array_size_ = other.array_size_;
-	array_ = narray;
+	if(narray)
+	{
+		count_ = other.count_;
+		array_size_ = other.array_size_;
+		array_ = narray;
 
-	std::copy(other.array_, other.array_ + count_, array_);
+		std::copy(other.array_, other.array_ + count_, array_);
+	}
 }
 
 
