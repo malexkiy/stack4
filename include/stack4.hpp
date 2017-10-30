@@ -90,7 +90,15 @@ void stack<T>::push(T const& obj)
 	{
 		auto array_size = array_size_ == 0 ? 1 : array_size_ * 2;
 		T* narray = new T[array_size];
-		std::copy(array_, array_ + count_, narray);
+		try
+		{
+			std::copy(array_, array_ + count_, narray);
+		}
+		catch(...)
+		{
+			delete[] narray;
+			throw "Failed to copy!\n";
+		}
 
 		array_size_ = array_size;
 
